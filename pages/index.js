@@ -1,5 +1,7 @@
 import Loader from "@/components/Loader"
 import { useState } from "react"
+import myimg from '../assets/weatherimage.jpg'
+import Image from "next/image";
 
 const Home = () => {
   const [isloading, setIsloading] = useState(false)
@@ -10,11 +12,11 @@ const Home = () => {
     if (cityName?.trim()) {
       setErrorMsg()
       setIsloading(true)
-      fetch(`http://api.weatherapi.com/v1/current.json?key=d24424080adc4a68af6201107230804&q=${cityName}`)
+      fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=391048bfc5a66a33b915281392e8e3e7`)
         .then((res) => res.json())
         .then((data) => {
-          if (data.error) {
-            setErrorMsg(data.error.message)
+          if (data.cod ==404) {
+            setErrorMsg(data.message)
             setIsloading(false)
             setCityName('')
           } else {
@@ -45,24 +47,28 @@ const Home = () => {
         <>
         {!isloading ? (
           <div className="weather-info">
-            <h2>{data?.location?.name ? data?.location?.name : 'No Data'}</h2>
+            <h2>{data?.name ? data?.name : 'No Data'}</h2>
             <div className="weather">
-              <img src={data?.current?.condition?.icon} alt="Weather Icon" />
-              <div className="temperature">{data?.current?.temp_c ? data?.current?.temp_c :'No Data'}&deg;C</div>
+              <Image
+              src={myimg}
+              height='90px'
+              width='70px'
+              />
+              <div className="temperature">{data?.main?.temp ? (data?.main?.temp-273.15).toFixed(2) :'No Data'}&deg;C</div>
             </div>
             <div className="description">Description of the weather conditions</div>
             <div className="details">
               <div className="detail">
                 <div className="label">Humidity</div>
-                <div className="value">{data?.current?.humidity ? data?.current?.humidity :'No Data'}%</div>
+                <div className="value">{data?.main?.humidity ? data?.main?.humidity :'No Data'}%</div>
               </div>
               <div className="detail">
                 <div className="label">Wind</div>
-                <div className="value">{data?.current?.wind_kph ? data?.current?.wind_kph : 'No Data'}km/h</div>
+                <div className="value">{data?.wind?.speed ? data?.wind?.speed : 'No Data'}km/h</div>
               </div>
               <div className="detail">
                 <div className="label">Feels Like</div>
-                <div className="value">{data?.current?.feelslike_c ? data?.current?.feelslike_c :'No Data'}&deg;C</div>
+                <div className="value">{data?.main?.feels_like ? (data?.main?.feels_like-273.15).toFixed(2) :'No Data'}&deg;C</div>
               </div>
             </div>
           </div>
